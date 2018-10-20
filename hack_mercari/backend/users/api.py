@@ -5,7 +5,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from core.permissions import AnonymousOnly
+from users.permissions import AnonymousOnly
 from users.serializers import LoginUserSerializer, UserSerializer
 
 
