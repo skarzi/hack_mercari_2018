@@ -2,6 +2,11 @@
   <q-page padding>
     <div class="form row text-center justify-center">
       <div class="form--option offset-xs-1 col-xs-10">
+        <p class="q-display-1">
+          New Delivery
+        </p>
+      </div>
+      <div class="form--option offset-xs-1 col-xs-10">
         <q-input
           v-model="recipientName"
           type="text"
@@ -9,11 +14,15 @@
         />
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
-        <q-input
-          v-model="pickupAddress"
-          type="text"
-          placeholder="Pickup address"
-        />
+        <div
+          class="q-if row no-wrap relative-position q-input q-if-standard q-if-has-content text-primary"
+        >
+          <gmap-autocomplete
+            class="q-input q-input-target"
+            @place_changed="setPickupAddress"
+          >
+          </gmap-autocomplete>
+        </div>
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
         <q-input
@@ -59,6 +68,9 @@ export default {
   },
   methods: {
     ...conditionsNamespace.mapActions(['setToolbarVisibility']),
+    setPickupAddress (pickupAddress) {
+      this.pickupAddress = pickupAddress.formatted_address
+    },
     async makeDelivery () {
       const payload = {
         recipient: this.recipientName,
@@ -69,10 +81,12 @@ export default {
         }
       }
       try {
-        let response = await this.$axios.post('/deliveries/', payload)
-        return response
+        await this.$axios.post('/deliveries/', payload)
+        this.$router.push('/deliveries/')
       } catch (error) {
-        return error
+        this.$q.notify({
+          message: 'Invalid delivery data provided'
+        })
       }
     }
   },
@@ -84,10 +98,13 @@ export default {
 
 <style scoped lang="stylus">
 .q-if-label
-  font-size 1.0em !important
+  font-size 1.3em !important
+
+.pac-container
+  width 100%
 
 .q-input-target
-  font-size 1.5em
+  font-size 1.3em !important
 
 .form--option
   margin 22px 0px
