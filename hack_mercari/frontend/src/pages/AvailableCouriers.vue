@@ -55,8 +55,7 @@ export default {
   },
   methods: {
     ...conditionsNamespace.mapActions(['setToolbarVisibility']),
-    getAvailableCouriers (senderLocation, recipientLocation) {
-      console.log(senderLocation, recipientLocation)
+    getAvailableCouriers (senderData, recipientData) {
       return [
         {
           id: 12,

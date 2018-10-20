@@ -14,7 +14,14 @@ const routes = [
         path: '/couriers',
         component: () => import('pages/AvailableCouriers.vue'),
         beforeEnter (to, from, next) {
-          next(vm => vm.setToolbarVisibility(false))
+          next(vm => vm.setToolbarVisibility(true))
+        }
+      },
+      {
+        path: '/orders',
+        component: () => import('pages/Orders.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(true))
         }
       }
     ]

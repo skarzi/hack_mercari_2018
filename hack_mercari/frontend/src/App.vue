@@ -12,5 +12,5 @@ export default {
 
 <style scoped lang="stylus">
 #q-app
-  background-image url('~assets/bg.png')
+  background url('~assets/bg.png') round fixed
 </style>
