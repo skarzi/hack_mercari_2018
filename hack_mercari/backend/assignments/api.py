@@ -24,6 +24,7 @@ class CourierAssignmentPropositionViewSet(ModelViewSet):
         delivery = assignment.delivery
 
         delivery.courier = courier
+        delivery.status = delivery.STATUS_WAITING_FOR_COURIER
         delivery.save()
         CourierAssignmentProposition.objects.filter(
             delivery=delivery

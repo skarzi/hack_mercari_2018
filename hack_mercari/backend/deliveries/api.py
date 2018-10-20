@@ -1,5 +1,6 @@
 from django.db.models import Q
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -32,7 +33,7 @@ class DeliveriesViewSet(ModelViewSet):
         return Response(DeliverySerializer(delivery).data)
 
     @action(methods=["POST"], detail=True)
-    def recipient_preference(self, request):
+    def recipient_preference(self, request, *args, **kwargs):
         serializer = MeetingPreferenceSerializer(request.data)
         serializer.is_valid(raise_exception=True)
         delivery = self.get_object()
@@ -40,3 +41,25 @@ class DeliveriesViewSet(ModelViewSet):
         delivery.save()
         assign_couriers.apply(delivery.id)
         return Response(DeliverySerializer(delivery).data)
+
+    @action(methods=["POST"], detail=True)
+    def pass_to_courier(self, request, *args, **kwargs):
+        delivery = self.get_object()
+        if request.user != delivery.sender:
+            raise PermissionDenied("You're not delivery sender")
+        if delivery.status != Delivery.STATUS_WAITING_FOR_COURIER:
+            raise PermissionDenied("Invalid delivery state")
+        delivery.status = Delivery.STATUS_IN_TRANSIT
+        delivery.save()
+        return Response()
+
+    @action(methods=["POST"], detail=True)
+    def receive(self, request, *args, **kwargs):
+        delivery = self.get_object()
+        if request.user != delivery.recipient:
+            raise PermissionDenied("You're not delivery recipient")
+        if delivery.status != Delivery.STATUS_IN_TRANSIT:
+            raise PermissionDenied("Invalid delivery state")
+        delivery.status = Delivery.STATUS_DELIVERED
+        delivery.save()
+        return Response()

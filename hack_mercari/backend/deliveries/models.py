@@ -1,15 +1,16 @@
-from django.apps import apps
 from django.db import models
 
 
 class Delivery(models.Model):
-    STATUS_PENDING = 1
-    STATUS_IN_PROGRESS = 2
-    STATUS_DONE = 3
+    STATUS_ASSIGNING = 'assigning'
+    STATUS_WAITING_FOR_COURIER = 'waiting_for_courier'
+    STATUS_IN_TRANSIT = 'in_transit'
+    STATUS_DELIVERED = 'delivered'
     STATUS_CHOICES = (
-        (STATUS_PENDING, 'Waiting for courier to pick-up'),
-        (STATUS_IN_PROGRESS, 'Courier is on the way'),
-        (STATUS_DONE, 'Package has been delivered')
+        (STATUS_ASSIGNING, 'Assigning to courier'),
+        (STATUS_WAITING_FOR_COURIER, 'Waiting for courier to pick up'),
+        (STATUS_IN_TRANSIT, 'Package is on it\'s way'),
+        (STATUS_DELIVERED, 'Package delivered')
     )
     description = models.TextField()
     sender = models.ForeignKey(
@@ -28,8 +29,10 @@ class Delivery(models.Model):
         on_delete=models.CASCADE,
         null=True, blank=True
     )
-    status = models.PositiveSmallIntegerField(
-        choices=STATUS_CHOICES, default=1
+    status = models.CharField(
+        max_length=32,
+        choices=STATUS_CHOICES,
+        default=STATUS_ASSIGNING
     )
     sender_preference = models.OneToOneField(
         'preferences.MeetingPreference',
@@ -43,4 +46,3 @@ class Delivery(models.Model):
         related_name='+',
         null=True, blank=True
     )
-
