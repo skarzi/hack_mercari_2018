@@ -39,7 +39,7 @@
               class="full-width"
               size="lg"
               label="Sign In"
-              @click="login"
+              @click="signIn"
             />
           </div>
         </div>
@@ -51,34 +51,60 @@
 <script>
 import { createNamespacedHelpers } from 'vuex'
 
-const { mapActions } = createNamespacedHelpers('conditions')
+const conditionsNamespace = createNamespacedHelpers('conditions')
+const usersNamespace = createNamespacedHelpers('users')
 
 export default {
   name: 'PageIndex',
   data () {
     return {
+      nextURL: '/orders',
       username: '',
       password: ''
     }
   },
+  computed: {
+    ...usersNamespace.mapState([
+      'token',
+      'userData'
+    ])
+  },
   methods: {
-    ...mapActions(['setToolbarVisibility']),
-    login () {
-      console.log(this.username, this.password)
+    ...conditionsNamespace.mapActions([
+      'setToolbarVisibility'
+    ]),
+    ...usersNamespace.mapActions([
+      'login'
+    ]),
+    async signIn () {
+      let isUserLogged = await this.login({
+        username: this.username,
+        password: this.password
+      })
+      if (isUserLogged === true) {
+        this.$router.push('/orders')
+      } else {
+        this.$q.notify({
+          message: 'Invalid credentials provided'
+        })
+      }
     }
   },
   mounted () {
     this.setToolbarVisibility(false)
+    if (this.token.length === 40 && this.userData !== {}) {
+      this.$router.push('/orders')
+    }
   }
 }
 </script>
 
 <style scope lang="stylus">
 .q-if-label
-  font-size 1.2em !important
+  font-size 1.0em !important
 
 .q-input-target
-  font-size 1.7em
+  font-size 1.5em
 
 .logo
   height 70px
@@ -89,7 +115,7 @@ export default {
   letter-spacing 1.4px
 
 .menu--title
-  font-size 3em
+  font-size 2.5em
   font-weight 300
   line-height normal
   letter-spacing 1.8px

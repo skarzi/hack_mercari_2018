@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 import example from './module-example'
 import conditions from './conditions'
-import deliveries from './deliveries'
+import users from './users'
 
 Vue.use(Vuex)
 
@@ -17,7 +17,7 @@ export default function (/* { ssrContext } */) {
     modules: {
       example,
       conditions,
-      deliveries
+      users
     }
   })
 
