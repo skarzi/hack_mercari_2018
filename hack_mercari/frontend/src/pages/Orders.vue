@@ -103,6 +103,7 @@ export default {
   margin-right 20px
 
 .q-list-header
+  line-height initial !important
   font-size 2em
 
 .q-item
@@ -119,6 +120,7 @@ export default {
   font-weight bold
 
 .arrival-time
+  white-space nowrap
   font-weight bold
 
 .courier--name

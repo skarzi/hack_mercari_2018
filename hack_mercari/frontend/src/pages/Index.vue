@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex">
+  <q-page class="flex items-center">
     <div class="menu row justify-cener text-center">
       <div class="menu--logo col-xs-12 text-center text-justify">
         <div class="row">
@@ -17,36 +17,31 @@
           </div>
         </div>
       </div>
-      <div class="menu--title col-xs-12 text-center">
-        Select your role
-      </div>
-      <div class="menu--options col-xs-12">
-        <div class="menu--option col-xs-12">
-          <q-btn
-            class="full-width"
-            color="primary"
-            label="Courier"
-            size="lg"
-            to=""
-          />
-        </div>
-        <div class="menu--option col-xs-12">
-          <q-btn
-            class="full-width"
-            color="primary"
-            label="Sender"
-            size="lg"
-            to=""
-          />
-        </div>
-        <div class="menu--option col-xs-12">
-          <q-btn
-            class="full-width"
-            color="primary"
-            size="lg"
-            label="Recipient"
-            to=""
-          />
+      <div class="menu--options offset-xs-1 col-xs-10">
+        <div class="row">
+          <div class="menu--option col-xs-12">
+            <q-input
+              v-model="username"
+              type="text"
+              placeholder="Username"
+            />
+          </div>
+          <div class="menu--option col-xs-12">
+            <q-input
+              v-model="password"
+              type="password"
+              placeholder="Password"
+            />
+          </div>
+          <div class="menu--option col-xs-12">
+            <q-btn
+              color="primary"
+              class="full-width"
+              size="lg"
+              label="Sign In"
+              @click="login"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -60,8 +55,17 @@ const { mapActions } = createNamespacedHelpers('conditions')
 
 export default {
   name: 'PageIndex',
+  data () {
+    return {
+      username: '',
+      password: ''
+    }
+  },
   methods: {
-    ...mapActions(['setToolbarVisibility'])
+    ...mapActions(['setToolbarVisibility']),
+    login () {
+      console.log(this.username, this.password)
+    }
   },
   mounted () {
     this.setToolbarVisibility(false)
@@ -70,11 +74,11 @@ export default {
 </script>
 
 <style scope lang="stylus">
-.menu
-  margin 80px 20px
+.q-if-label
+  font-size 1.2em !important
 
-.menu--logo
-  margin-top 20px
+.q-input-target
+  font-size 1.7em
 
 .logo
   height 70px
@@ -83,10 +87,8 @@ export default {
   font-size 2.5em
   font-weight bold
   letter-spacing 1.4px
-  margin-top 20px
 
 .menu--title
-  margin-top 50px
   font-size 3em
   font-weight 300
   line-height normal
