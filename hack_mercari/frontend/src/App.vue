@@ -10,5 +10,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped lang="stylus">
+#q-app
+  background-image url('~assets/bg.png')
 </style>
