@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.db import models
 
 
@@ -42,3 +43,4 @@ class Delivery(models.Model):
         related_name='+',
         null=True, blank=True
     )
+
