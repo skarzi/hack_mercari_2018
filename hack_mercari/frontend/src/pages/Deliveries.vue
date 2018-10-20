@@ -10,27 +10,39 @@
         Current Orders
       </q-list-header>
       <q-item
-        v-for="order in getOrders(1)"
+        v-for="order in deliveries"
         :key="order.id"
-        :to="`order/${order.id}`"
       >
         <q-item-main>
           <q-item-tile label>
             <p class="courier--name">
-              Order #{{ order.id }}
+              Order <b>#{{ order.id }}</b>
             </p>
           </q-item-tile>
-          <q-item-tile sublabel>
+          <q-item-tile class="date__details" sublabel>
             Forwarded to the courier:
             <span class="arrival-time">
-              {{ order.forwardedDate }}
+              {{ order.sender_preference.when }}
             </span>
           </q-item-tile>
-          <q-item-tile sublabel>
-            Estimated delivery date:
-            <span class="arrival-time">
-              {{ order.estimatedDeliveryDate }}
-            </span>
+          <q-item-tile class="date__details" sublabel>
+            <div v-if="order.recipient_preference">
+              Estimated delivery date:
+              <span class="arrival-time">
+                {{ order.recipient_preference.when }}
+              </span>
+            </div>
+            <div v-else>
+              Waiting for recipient response.
+            </div>
+          </q-item-tile>
+          <q-item-separator/>
+          <q-item-tile
+            class="order--description"
+            v-if="order.description"
+            sublabel
+          >
+            {{ order.description }}
           </q-item-tile>
         </q-item-main>
       </q-item>
@@ -50,53 +62,40 @@
 import { createNamespacedHelpers } from 'vuex'
 
 const conditionsNamespace = createNamespacedHelpers('conditions')
+const usersNamespace = createNamespacedHelpers('users')
 
 export default {
   name: 'Deliveries',
+  data () {
+    return {
+      deliveries: []
+    }
+  },
+  computed: {
+    ...usersNamespace.mapGetters(['isAuthenticated'])
+  },
   methods: {
     ...conditionsNamespace.mapActions(['setToolbarVisibility']),
-    getOrders (userID) {
-      return [
-        {
-          id: 1,
-          forwardedDate: '14:34 20.10.2018',
-          estimatedDeliveryDate: '16:34 20.10.2018'
-        },
-        {
-          id: 2,
-          forwardedDate: '14:34 20.10.2018',
-          estimatedDeliveryDate: '16:34 20.10.2018'
-        },
-        {
-          id: 3,
-          forwardedDate: '14:34 20.10.2018',
-          estimatedDeliveryDate: '16:34 20.10.2018'
-        },
-        {
-          id: 5,
-          forwardedDate: '14:34 20.10.2018',
-          estimatedDeliveryDate: '16:34 20.10.2018'
-        },
-        {
-          id: 6,
-          forwardedDate: '14:34 20.10.2018',
-          estimatedDeliveryDate: '16:34 20.10.2018'
-        },
-        {
-          id: 7,
-          forwardedDate: '14:34 20.10.2018',
-          estimatedDeliveryDate: '16:34 20.10.2018'
-        }
-      ]
+    async getOrdersFromAPI () {
+      if (this.isAuthenticated) {
+        this.$q.loading.show({
+        })
+        let response = await this.$axios.get('/deliveries/')
+        this.deliveries = response.data.reverse()
+        this.$q.loading.hide()
+      }
     }
   },
   mounted () {
     this.setToolbarVisibility(true)
+    this.getOrdersFromAPI()
   }
 }
 </script>
 
 <style scoped lang="stylus">
+@import '~variables'
+
 .list--self
   margin-top 10px
   margin-left 20px
@@ -125,6 +124,12 @@ export default {
 
 .courier--name
   font-size 1.5em !important
+
+.order--description
+  color $light
+
+.date__details
+  color $tertiary
 
 .FAB
   right 20px

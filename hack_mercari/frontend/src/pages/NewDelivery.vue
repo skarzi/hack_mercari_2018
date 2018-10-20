@@ -72,6 +72,7 @@ export default {
       this.pickupAddress = pickupAddress.formatted_address
     },
     async makeDelivery () {
+      this.$q.loading.show()
       const payload = {
         recipient: this.recipientName,
         description: this.description,
@@ -82,8 +83,10 @@ export default {
       }
       try {
         await this.$axios.post('/deliveries/', payload)
+        this.$q.loading.hide()
         this.$router.push('/deliveries/')
       } catch (error) {
+        this.$q.loading.hide()
         this.$q.notify({
           message: 'Invalid delivery data provided'
         })

@@ -77,13 +77,16 @@ export default {
       'login'
     ]),
     async signIn () {
+      this.$q.loading.show()
       let isUserLogged = await this.login({
         username: this.username,
         password: this.password
       })
       if (isUserLogged === true) {
+        this.$q.loading.hide()
         this.$router.push(this.nextURL)
       } else {
+        this.$q.loading.hide()
         this.$q.notify({
           message: 'Invalid credentials provided'
         })
