@@ -8,6 +8,7 @@ from assignments.tasks import assign_couriers
 from deliveries.models import Delivery
 from deliveries.serializers import CreateDeliverySerializer, DeliverySerializer
 from preferences.serializers import MeetingPreferenceSerializer
+from services.pusher import PusherClient
 
 
 class DeliveriesViewSet(ModelViewSet):
@@ -43,6 +44,17 @@ class DeliveriesViewSet(ModelViewSet):
         return Response(DeliverySerializer(delivery).data)
 
     @action(methods=["POST"], detail=True)
+    def request_pass_to_courier(self, request, *args, **kwargs):
+        delivery = self.get_object()
+        if request.user != delivery.courier:
+            raise PermissionDenied("You're not a courier")
+        PusherClient.trigger(
+            [delivery.sender.username],
+            'pass-to-courier', {'delivery': delivery.id}
+        )
+        return Response()
+
+    @action(methods=["POST"], detail=True)
     def pass_to_courier(self, request, *args, **kwargs):
         delivery = self.get_object()
         if request.user != delivery.sender:
@@ -51,6 +63,17 @@ class DeliveriesViewSet(ModelViewSet):
             raise PermissionDenied("Invalid delivery state")
         delivery.status = Delivery.STATUS_IN_TRANSIT
         delivery.save()
+        return Response()
+
+    @action(methods=["POST"], detail=True)
+    def request_receive(self, request, *args, **kwargs):
+        delivery = self.get_object()
+        if request.user != delivery.courier:
+            raise PermissionDenied("You're not a courier")
+        PusherClient.trigger(
+            [delivery.recipient.username],
+            'receive', {'delivery': delivery.id}
+        )
         return Response()
 
     @action(methods=["POST"], detail=True)

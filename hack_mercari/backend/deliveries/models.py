@@ -1,5 +1,7 @@
 from django.db import models
 
+from services.pusher import PusherClient
+
 
 class Delivery(models.Model):
     STATUS_ASSIGNING = 'assigning'
@@ -46,3 +48,17 @@ class Delivery(models.Model):
         related_name='+',
         null=True, blank=True
     )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.push_notifications()
+
+    def push_notifications(self):
+        push_recipients = [
+            self.sender.username, self.recipient.username
+        ]
+        if self.courier:
+            push_recipients.append(self.courier.username)
+        PusherClient.trigger(
+            push_recipients, 'delivery-updated', {}
+        )

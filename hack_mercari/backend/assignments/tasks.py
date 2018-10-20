@@ -1,4 +1,5 @@
 from config.celery import app
+from services.pusher import PusherClient
 
 
 @app.task()
@@ -14,5 +15,9 @@ def assign_couriers(delivery_id):
         CourierAssignmentProposition.objects.create(
             courier=courier, delivery=delivery
         )
+    PusherClient.trigger(
+        [courier.username for courier in couriers],
+        'new-assignment', {}
+    )
 
     # todo: this should use actual ML algorithm
