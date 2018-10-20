@@ -30,6 +30,13 @@ const routes = [
         beforeEnter (to, from, next) {
           next(vm => vm.setToolbarVisibility(true))
         }
+      },
+      {
+        path: '/deliveries/:id/status/',
+        component: () => import('pages/DeliveryStatus.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(true))
+        }
       }
     ]
   }

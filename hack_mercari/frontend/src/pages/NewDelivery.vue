@@ -34,8 +34,10 @@
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
         <q-datetime
-          v-model="pickupDateTime"
+          v-model="pickupDateTime.start"
           type="datetime"
+          :default-value="new Date()"
+          placeholder="Pickup Date & time"
         />
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
@@ -61,24 +63,35 @@ export default {
   data () {
     return {
       recipientName: '',
-      pickupDateTime: new Date(),
-      pickupAddress: '',
+      pickupDateTime: {},
+      pickupLocation: '',
       description: ''
     }
   },
   methods: {
     ...conditionsNamespace.mapActions(['setToolbarVisibility']),
-    setPickupAddress (pickupAddress) {
-      this.pickupAddress = pickupAddress.formatted_address
+    setPickupAddress (pickupLocation) {
+      console.log(pickupLocation)
+      this.pickupLocation = JSON.stringify({
+        address: pickupLocation.formatted_address,
+        position: {
+          lat: pickupLocation.geometry.location.lat(),
+          lng: pickupLocation.geometry.location.lng()
+        }
+      })
+      console.log(this.pickupLocation)
     },
     async makeDelivery () {
       this.$q.loading.show()
+      if (!this.pickupDateTime.start) {
+        this.pickupDateTime.start = new Date()
+      }
       const payload = {
         recipient: this.recipientName,
         description: this.description,
         sender_preference: {
-          when: this.pickupDateTime.toJSON(),
-          where: this.pickupAddress
+          when: this.pickupDateTime.start.toJSON(),
+          where: this.pickupLocation
         }
       }
       try {

@@ -12,6 +12,7 @@
       <q-item
         v-for="order in deliveries"
         :key="order.id"
+        :to="`/deliveries/${order.id}/status/`"
       >
         <q-item-main>
           <q-item-tile label>

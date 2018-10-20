@@ -1,8 +1,5 @@
 import { apiAxios } from '../../plugins/axios.js'
-
-function isSuccessfull (response) {
-  return response.status >= 200 && response.status <= 200
-}
+import { isSuccessfull } from '../../utils.js'
 
 async function _login (payload) {
   try {
