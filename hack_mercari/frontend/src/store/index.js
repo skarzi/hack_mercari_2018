@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import example from './module-example'
 import conditions from './conditions'
+import deliveries from './deliveries'
 
 Vue.use(Vuex)
 
@@ -15,7 +16,8 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       example,
-      conditions
+      conditions,
+      deliveries
     }
   })
 

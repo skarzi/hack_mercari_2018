@@ -1,10 +1,22 @@
-
 const routes = [
   {
     path: '/',
     component: () => import('layouts/MyLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') }
+      {
+        path: '',
+        component: () => import('pages/Index.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(false))
+        }
+      },
+      {
+        path: '/couriers',
+        component: () => import('pages/AvailableCouriers.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(false))
+        }
+      }
     ]
   }
 ]
