@@ -10,6 +10,7 @@ class Delivery(models.Model):
         (STATUS_IN_PROGRESS, 'Courier is on the way'),
         (STATUS_DONE, 'Package has been delivered')
     )
+    description = models.TextField()
     sender = models.ForeignKey(
         'users.User',
         related_name='+',
@@ -23,10 +24,11 @@ class Delivery(models.Model):
     courier = models.ForeignKey(
         'users.User',
         related_name='+',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True, blank=True
     )
     status = models.PositiveSmallIntegerField(
-        choices=STATUS_CHOICES
+        choices=STATUS_CHOICES, default=1
     )
     sender_preference = models.OneToOneField(
         'preferences.MeetingPreference',
