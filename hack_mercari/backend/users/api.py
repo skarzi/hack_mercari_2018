@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from core.permissions import AnonymousOnly
-from users.serializers import LoginUserSerializer
+from users.serializers import LoginUserSerializer, UserSerializer
 
 
 class AuthViewSet(ViewSet):
@@ -24,7 +24,12 @@ class AuthViewSet(ViewSet):
                 detail="Incorrect credentials."
             )
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key})
+        return Response(
+            {
+                "token": token.key,
+                **UserSerializer(user).data
+            }
+        )
 
     @list_route(methods=["post"])
     def logout(self, request):
