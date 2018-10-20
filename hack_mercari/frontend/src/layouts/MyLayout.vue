@@ -3,23 +3,21 @@
     <q-layout-header>
       <q-toolbar
         color="primary"
-        :glossy="$q.theme === 'mat'"
         :inverted="$q.theme === 'ios'"
+        v-if="toolbarVisibility"
       >
         <q-btn
           flat
           dense
           round
-          @click="leftDrawerOpen = !leftDrawerOpen"
           aria-label="Menu"
         >
           <q-icon name="menu" />
         </q-btn>
-
+          Menu
         <q-toolbar-title>
-          Quasar App
-          <div slot="subtitle">Running on Quasar v{{ $q.version }}</div>
         </q-toolbar-title>
+        <img src="" alt="Logo">
       </q-toolbar>
     </q-layout-header>
 
@@ -64,6 +62,9 @@
 
 <script>
 import { openURL } from 'quasar'
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapState, mapActions } = createNamespacedHelpers('conditions')
 
 export default {
   name: 'MyLayout',
@@ -72,8 +73,19 @@ export default {
       leftDrawerOpen: this.$q.platform.is.desktop
     }
   },
+  computed: {
+    ...mapState([
+      'toolbarVisibility'
+    ])
+  },
   methods: {
-    openURL
+    openURL,
+    ...mapActions([
+      'setToolbarVisibility'
+    ])
+  },
+  mounted () {
+    this.setToolbarVisibility(true)
   }
 }
 </script>
