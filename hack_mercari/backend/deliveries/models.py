@@ -28,3 +28,15 @@ class Delivery(models.Model):
     status = models.PositiveSmallIntegerField(
         choices=STATUS_CHOICES
     )
+    sender_preference = models.OneToOneField(
+        'preferences.MeetingPreference',
+        on_delete=models.SET_NULL,
+        related_name='+',
+        null=True, blank=True
+    )
+    recipient_preference = models.OneToOneField(
+        'preferences.MeetingPreference',
+        on_delete=models.SET_NULL,
+        related_name='+',
+        null=True, blank=True
+    )
