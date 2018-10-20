@@ -58,7 +58,7 @@ export default {
   name: 'PageIndex',
   data () {
     return {
-      nextURL: '/orders',
+      nextURL: '/deliveries',
       username: '',
       password: ''
     }
@@ -82,7 +82,7 @@ export default {
         password: this.password
       })
       if (isUserLogged === true) {
-        this.$router.push('/orders')
+        this.$router.push(this.nextURL)
       } else {
         this.$q.notify({
           message: 'Invalid credentials provided'
@@ -93,7 +93,7 @@ export default {
   mounted () {
     this.setToolbarVisibility(false)
     if (this.token.length === 40 && this.userData !== {}) {
-      this.$router.push('/orders')
+      this.$router.push(this.nextURL)
     }
   }
 }

@@ -18,8 +18,15 @@ const routes = [
         }
       },
       {
-        path: '/orders',
-        component: () => import('pages/Orders.vue'),
+        path: '/deliveries',
+        component: () => import('pages/Deliveries.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(true))
+        }
+      },
+      {
+        path: '/new-delivery',
+        component: () => import('pages/NewDelivery.vue'),
         beforeEnter (to, from, next) {
           next(vm => vm.setToolbarVisibility(true))
         }

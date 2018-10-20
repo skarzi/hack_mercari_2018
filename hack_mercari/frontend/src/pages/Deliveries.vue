@@ -41,7 +41,7 @@
       size="lg"
       color="warning"
       icon="add"
-      to="/new-order"
+      to="/new-delivery"
     />
   </q-page>
 </template>
@@ -52,7 +52,7 @@ import { createNamespacedHelpers } from 'vuex'
 const conditionsNamespace = createNamespacedHelpers('conditions')
 
 export default {
-  name: 'Orders',
+  name: 'Deliveries',
   methods: {
     ...conditionsNamespace.mapActions(['setToolbarVisibility']),
     getOrders (userID) {
