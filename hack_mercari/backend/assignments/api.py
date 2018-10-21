@@ -5,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from assignments.models import CourierAssignmentProposition
 from assignments.serializers import CourierAssignmentPropositionSerializer
+from deliveries.serializers import DeliverySerializer
 from users.permissions import CourierOnly
 
 
@@ -16,6 +17,13 @@ class CourierAssignmentPropositionViewSet(ModelViewSet):
         return CourierAssignmentProposition.objects.filter(
             courier=self.request.user
         )
+
+    def list(self, request, *args, **kwargs):
+        qs = self.get_queryset().select_related('delivery')
+        serializer = DeliverySerializer(
+            [assignment.delivery for assignment in qs], many=True
+        )
+        return Response(serializer.data)
 
     @action(methods=["POST"], detail=True)
     def accept(self, request, *args, **kwargs):
