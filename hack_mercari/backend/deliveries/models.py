@@ -4,11 +4,13 @@ from services.pusher import PusherClient
 
 
 class Delivery(models.Model):
+    STATUS_WAITING_FOR_PREFERENCE = 'waiting_for_preference'
     STATUS_ASSIGNING = 'assigning'
     STATUS_WAITING_FOR_COURIER = 'waiting_for_courier'
     STATUS_IN_TRANSIT = 'in_transit'
     STATUS_DELIVERED = 'delivered'
     STATUS_CHOICES = (
+        (STATUS_WAITING_FOR_PREFERENCE, 'Waiting for preference'),
         (STATUS_ASSIGNING, 'Assigning to courier'),
         (STATUS_WAITING_FOR_COURIER, 'Waiting for courier to pick up'),
         (STATUS_IN_TRANSIT, 'Package is on it\'s way'),
@@ -34,7 +36,7 @@ class Delivery(models.Model):
     status = models.CharField(
         max_length=32,
         choices=STATUS_CHOICES,
-        default=STATUS_ASSIGNING
+        default=STATUS_WAITING_FOR_PREFERENCE
     )
     sender_preference = models.OneToOneField(
         'preferences.MeetingPreference',

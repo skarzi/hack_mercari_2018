@@ -35,12 +35,13 @@ class DeliveriesViewSet(ModelViewSet):
 
     @action(methods=["POST"], detail=True)
     def recipient_preference(self, request, *args, **kwargs):
-        serializer = MeetingPreferenceSerializer(request.data)
+        serializer = MeetingPreferenceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         delivery = self.get_object()
         delivery.recipient_preference = serializer.save()
+        delivery.status = delivery.STATUS_ASSIGNING
         delivery.save()
-        assign_couriers.apply(delivery.id)
+        assign_couriers(delivery.id)
         return Response(DeliverySerializer(delivery).data)
 
     @action(methods=["POST"], detail=True)

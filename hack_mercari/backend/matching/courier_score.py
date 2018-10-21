@@ -22,8 +22,8 @@ def calculate_courier_preference_score(preference, courier):
     return score(
         history,
         preference.when_min.weekday(),
-        preference.when_min.timestamp(),
-        preference.when_max.timestamp(),
+        preference.when_min,
+        preference.when_max,
         where['position']['lat'],
         where['position']['lng']
     )
@@ -35,10 +35,14 @@ def score(data, weekday, time_min, time_max, latitude, longitude, radius=config.
         (data['time_of_day'] <= (time_max.hour * 60 + time_max.minute)) &
         (data['weekday'] == weekday)
         ]
-
+    if not data.shape[0]:
+        print("NO DATA")
+        return 0
     def is_in_radius(row):
         distance = sqrt((row['latitude'] - latitude) ** 2 + (row['longitude'] - longitude) ** 2)
         return distance <= radius
 
     data['is_in_radius'] = data.apply(is_in_radius, axis=1)
-    return data['is_in_radius'].value_counts(normalize=True)[True]
+    score = data['is_in_radius'].value_counts(normalize=True).get(True, 0)
+    print(f"SCORE: {score}")
+    return score

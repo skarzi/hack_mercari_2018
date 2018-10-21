@@ -5,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from assignments.models import CourierAssignmentProposition
 from assignments.serializers import CourierAssignmentPropositionSerializer
+from deliveries.models import Delivery
 from deliveries.serializers import DeliverySerializer
 from users.permissions import CourierOnly
 
@@ -18,6 +19,12 @@ class CourierAssignmentPropositionViewSet(ModelViewSet):
             courier=self.request.user
         )
 
+    def retrieve(self, request, *args, **kwargs):
+        # terrible workaround
+        delivery = Delivery.objects.get(pk=kwargs.get("pk"))
+        serializer = DeliverySerializer(delivery)
+        return Response(serializer.data)
+
     def list(self, request, *args, **kwargs):
         qs = self.get_queryset().select_related('delivery')
         serializer = DeliverySerializer(
@@ -27,9 +34,8 @@ class CourierAssignmentPropositionViewSet(ModelViewSet):
 
     @action(methods=["POST"], detail=True)
     def accept(self, request, *args, **kwargs):
-        assignment = self.get_object()
+        delivery = Delivery.objects.get(pk=kwargs.get("pk"))
         courier = request.user
-        delivery = assignment.delivery
 
         delivery.courier = courier
         delivery.status = delivery.STATUS_WAITING_FOR_COURIER

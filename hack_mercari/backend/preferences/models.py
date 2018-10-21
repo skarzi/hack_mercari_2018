@@ -2,5 +2,7 @@ from django.db import models
 
 
 class MeetingPreference(models.Model):
-    when = models.DateTimeField()
+    when_min = models.DateTimeField()
+    when_max = models.DateTimeField()
+
     where = models.TextField()

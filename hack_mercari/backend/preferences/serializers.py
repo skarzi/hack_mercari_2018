@@ -6,4 +6,4 @@ from preferences.models import MeetingPreference
 class MeetingPreferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = MeetingPreference
-        fields = ('when', 'where')
+        fields = ('when_min', 'when_max', 'where')
