@@ -16,3 +16,5 @@ TIME_OF_DAY_BOUNDARIES = [
     time(8, 0),
     time(22, 0)
 ]
+RADIUS = 0.005
+MINIMUM_SCORE_EXPECTED = 0.7

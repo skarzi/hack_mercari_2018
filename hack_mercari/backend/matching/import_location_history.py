@@ -50,4 +50,4 @@ def import_location_history(courier, filename):
         ]
 
     # save to csv
-    df.to_csv(f'data/history_{courier.username}.csv')
+    df.to_csv(f'data/history_{courier.username}.csv', index=False)

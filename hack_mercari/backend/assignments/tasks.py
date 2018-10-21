@@ -1,4 +1,5 @@
 from config.celery import app
+from matching.courier_score import should_courier_be_assigned
 from services.pusher import PusherClient
 
 
@@ -12,12 +13,12 @@ def assign_couriers(delivery_id):
     delivery = Delivery.objects.get(id=delivery_id)
     couriers = User.objects.filter(is_courier=True)
     for courier in couriers.all():
-        CourierAssignmentProposition.objects.create(
-            courier=courier, delivery=delivery
-        )
-    PusherClient.trigger(
-        [courier.username for courier in couriers],
-        'new-assignment', {}
-    )
-
-    # todo: this should use actual ML algorithm
+        if should_courier_be_assigned(delivery, courier):
+            CourierAssignmentProposition.objects.create(
+                courier=courier, delivery=delivery
+            )
+            PusherClient.trigger(
+                [courier.username],
+                'new-assignment', {}
+            )
+            print(f"Courier {courier.username} assigned!")
