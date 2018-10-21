@@ -13,7 +13,7 @@ module.exports = function (ctx) {
       'app.styl'
     ],
     extras: [
-      ctx.theme.mat ? 'roboto-font' : null,
+      'roboto-font',
       'material-icons',
       // 'ionicons',
       // 'mdi',
@@ -78,8 +78,8 @@ module.exports = function (ctx) {
       // workboxPluginMode: 'InjectManifest',
       // workboxOptions: {},
       manifest: {
-        // name: 'Quasar App',
-        // short_name: 'Quasar-PWA',
+        name: 'BTW delivery',
+        short_name: 'BTW delivery',
         // description: 'Best PWA App in town!',
         display: 'standalone',
         orientation: 'portrait',

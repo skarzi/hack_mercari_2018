@@ -6,13 +6,13 @@
           <div class="col-xs-12 text-center">
             <img
               class="logo"
-              src="~assets/quasar-logo-full.svg"
+              src="~assets/logo.png"
               alt="Logo"
             >
           </div>
           <div class="col-xs-12">
             <p class="app-name text-center">
-              Our Name
+              BTW delivery
             </p>
           </div>
         </div>
@@ -160,10 +160,10 @@ export default {
   font-size 1.5em
 
 .logo
-  height 70px
+  height 100px
 
 .app-name
-  font-size 2.5em
+  font-size 2.1em
   font-weight bold
   letter-spacing 1.4px
 

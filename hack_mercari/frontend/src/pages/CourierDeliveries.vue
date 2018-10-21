@@ -4,7 +4,7 @@
       highlight
       multiline
       no-border
-      class="list--self"
+      class="list--self q-mx-md q-my-xs"
     >
       <q-list-header>
         Possible deliveries
@@ -13,6 +13,7 @@
         v-for="delivery in assignments"
         :key="delivery.id"
         :to="`/courier-delivery/${delivery.id}`"
+        class="q-py-md"
       >
         <q-item-main>
           <q-item-tile label>
@@ -41,7 +42,7 @@
       highlight
       multiline
       no-border
-      class="list--self"
+      class="list--self q-mx-md q-my-xs"
     >
       <q-list-header>
         Accepted Deliveries
@@ -50,6 +51,7 @@
         v-for="delivery in deliveries"
         :key="delivery.id"
         :to="`/courier-delivery/${delivery.id}/`"
+        class="q-py-md"
       >
         <q-item-main>
           <q-item-tile label>
@@ -154,19 +156,12 @@ export default {
 <style scoped lang="stylus">
 @import '~variables'
 
-.list--self
-  margin-top 10px
-  margin-left 20px
-  margin-right 20px
-
 .q-list-header
   line-height initial !important
   font-size 2em
 
 .q-item
   margin-top 15px
-  padding-top 15px !important
-  padding-bottom 15px !important
   background-color white
 
 .q-item-sublabel

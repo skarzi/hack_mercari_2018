@@ -18,7 +18,7 @@
         Go back
         <q-toolbar-title>
         </q-toolbar-title>
-        <img src="" alt="Logo">
+        <img class="logo" src="~assets/logo.png" alt="Logo">
       </q-toolbar>
     </q-layout-header>
 
@@ -61,5 +61,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped lang="stylus">
+.logo
+  height 40px
 </style>
