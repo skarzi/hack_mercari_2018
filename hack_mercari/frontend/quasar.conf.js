@@ -5,7 +5,9 @@ module.exports = function (ctx) {
     // app plugins (/src/plugins)
     plugins: [
       'axios',
-      'googleMaps'
+      'googleMaps',
+      'pusher',
+      'SweetAlert'
     ],
     css: [
       'app.styl'

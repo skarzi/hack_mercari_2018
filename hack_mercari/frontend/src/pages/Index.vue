@@ -85,12 +85,69 @@ export default {
       if (isUserLogged === true) {
         this.$q.loading.hide()
         this.$router.push(this.nextURL)
+        this.setupPusher()
       } else {
         this.$q.loading.hide()
         this.$q.notify({
           message: 'Invalid credentials provided'
         })
       }
+    },
+    setupPusher () {
+      const channel = this.$pusher.subscribe(this.userData.username)
+      if (!this.userData) {
+        return
+      }
+      channel.bind('deliver-updated', (data) => {
+        // refresh deliveries
+        this.$router.go()
+      })
+      channel.bind('pass-to-courier', (data) => {
+        console.log(`passed to courier delivery #${data.delivery}`)
+        this.notifyUser({
+          title: 'Your delivery have been picked up by courier!',
+          text: '',
+          confirmText: 'Accept',
+          cancelText: 'Cancel'
+        }).then((result) => {
+          if (result.value) {
+            this.$axios.post(
+              `/deliveries/${data.delivery}/pass_to_courier/`
+            )
+          }
+        })
+      })
+      channel.bind('receive', (data) => {
+        console.log(`receive to courier delivery #${data.delivery}`)
+        this.notifyUser({
+          title: 'Someone want to deliver you something!',
+          text: '',
+          confirmText: 'Cool',
+          cancelText: 'Dismiss'
+        }).then((result) => {
+          if (result.value) {
+            this.$axios.post(
+              `/deliveries/${data.delivery}/receive/`
+            )
+          }
+        })
+      })
+      if (this.userData.is_courier) {
+        channel.bind('new-assignment', (data) => {
+          this.$router.go('/deliveries')
+        })
+      }
+    },
+    notifyUser (data) {
+      return this.$swal({
+        title: data.title,
+        text: data.text,
+        type: 'success',
+        showCancelButton: Boolean(data.cancelText),
+        confirmButtonText: data.confirmText,
+        cancelButtonText: data.cancelText
+        // reverseButtons: true
+      })
     }
   },
   mounted () {
@@ -103,6 +160,8 @@ export default {
 </script>
 
 <style scope lang="stylus">
+@import '~variables'
+
 .q-if-label
   font-size 1.0em !important
 
@@ -125,4 +184,10 @@ export default {
 
 .menu--option
   margin 32px 0px
+
+.button__success
+  background-color $sucess
+
+.button__negative
+  background-color $negative
 </style>
