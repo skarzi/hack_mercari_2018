@@ -7,7 +7,7 @@
       class="list--self"
     >
       <q-list-header>
-        Current Orders
+        Your Deliveries
       </q-list-header>
       <q-item
         v-for="order in deliveries"
@@ -73,15 +73,20 @@ export default {
     }
   },
   computed: {
+    ...usersNamespace.mapState(['userData']),
     ...usersNamespace.mapGetters(['isAuthenticated'])
   },
   methods: {
     ...conditionsNamespace.mapActions(['setToolbarVisibility']),
     async getOrdersFromAPI () {
+      let path = '/deliveries/'
+      if (this.userData.is_courier) {
+        path = '/assignments/'
+      }
       if (this.isAuthenticated) {
         this.$q.loading.show({
         })
-        let response = await this.$axios.get('/deliveries/')
+        let response = await this.$axios.get(path)
         this.deliveries = response.data.reverse()
         this.$q.loading.hide()
       }

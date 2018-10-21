@@ -37,6 +37,13 @@ const routes = [
         beforeEnter (to, from, next) {
           next(vm => vm.setToolbarVisibility(true))
         }
+      },
+      {
+        path: '/confirm-delivery/:id/',
+        component: () => import('pages/ConfirmDelivery.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(true))
+        }
       }
     ]
   }
