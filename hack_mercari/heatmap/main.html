@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Heat map visualisation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>
+</head>
+<body>
+    <div class="slidecontainer">
+        <input type="range" min="8" max="22" value="8   " class="slider" id="myRange" onchange="updateSlider(this.value)">
+    </div>
+    <iframe src = 'heatmaps/heatmap8.html' id = 'iframe' width="600px" height="600px"></iframe>
+    <h5 id='sliderAmount'></h5>
+    <script>
+        function updateSlider(slideAmount) {
+            var sliderDiv = document.getElementById("iframe");
+            sliderDiv.src = `heatmaps/heatmap${slideAmount}.html`;
+        }
+    </script>
+</body>
+</html>
