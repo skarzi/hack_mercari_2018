@@ -25,8 +25,22 @@ const routes = [
         }
       },
       {
+        path: '/courier-deliveries',
+        component: () => import('pages/CourierDeliveries.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(true))
+        }
+      },
+      {
         path: '/new-delivery',
         component: () => import('pages/NewDelivery.vue'),
+        beforeEnter (to, from, next) {
+          next(vm => vm.setToolbarVisibility(true))
+        }
+      },
+      {
+        path: '/deliveries/:id/recipient-preference/',
+        component: () => import('pages/RecipientPreference.vue'),
         beforeEnter (to, from, next) {
           next(vm => vm.setToolbarVisibility(true))
         }
@@ -39,8 +53,8 @@ const routes = [
         }
       },
       {
-        path: '/confirm-delivery/:id/',
-        component: () => import('pages/ConfirmDelivery.vue'),
+        path: '/courier-delivery/:id/',
+        component: () => import('pages/CourierDelivery.vue'),
         beforeEnter (to, from, next) {
           next(vm => vm.setToolbarVisibility(true))
         }

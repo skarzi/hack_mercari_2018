@@ -58,7 +58,6 @@ export default {
   name: 'PageIndex',
   data () {
     return {
-      nextURL: '/deliveries',
       username: '',
       password: ''
     }
@@ -67,7 +66,10 @@ export default {
     ...usersNamespace.mapState([
       'token',
       'userData'
-    ])
+    ]),
+    nextURL () {
+      return this.userData.is_courier ? '/courier-deliveries' : '/deliveries/'
+    }
   },
   methods: {
     ...conditionsNamespace.mapActions([

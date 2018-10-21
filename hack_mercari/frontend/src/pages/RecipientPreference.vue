@@ -3,15 +3,8 @@
     <div class="form row text-center justify-center">
       <div class="form--option offset-xs-1 col-xs-10">
         <p class="q-display-1">
-          New Delivery
+          Add delivery preference
         </p>
-      </div>
-      <div class="form--option offset-xs-1 col-xs-10">
-        <q-input
-          v-model="recipientName"
-          type="text"
-          placeholder="Recipient"
-        />
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
         <div
@@ -20,25 +13,17 @@
           <gmap-autocomplete
             class="q-input q-input-target"
             @place_changed="setPickupAddress"
-            placeholder="Pickup location"
+            placeholder="Delivery location"
           >
           </gmap-autocomplete>
         </div>
-      </div>
-      <div class="form--option offset-xs-1 col-xs-10">
-        <q-input
-          v-model="description"
-          type="textarea"
-          rows="1"
-          placeholder="Description"
-        />
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
         <q-datetime
           v-model="pickupDateTime.start"
           type="datetime"
           :default-value="new Date()"
-          placeholder="Pickup between"
+          placeholder="Delivery between"
         />
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
@@ -46,7 +31,7 @@
           v-model="pickupDateTime.end"
           type="datetime"
           :default-value="new Date()"
-          placeholder="Pickup between"
+          placeholder="Delivery between"
         />
       </div>
       <div class="form--option offset-xs-1 col-xs-10">
@@ -54,7 +39,7 @@
           color="primary"
           class="full-width"
           size="lg"
-          label="Make Delivery"
+          label="Set preference"
           @click="makeDelivery"
         />
       </div>
@@ -75,6 +60,11 @@ export default {
       pickupDateTime: {},
       pickupLocation: '',
       description: ''
+    }
+  },
+  computed: {
+    deliveryId () {
+      return this.$route.params.id
     }
   },
   methods: {
@@ -100,16 +90,12 @@ export default {
       }
 
       const payload = {
-        recipient: this.recipientName,
-        description: this.description,
-        sender_preference: {
-          when_min: this.pickupDateTime.start.toJSON(),
-          when_max: this.pickupDateTime.end.toJSON(),
-          where: this.pickupLocation
-        }
+        when_min: this.pickupDateTime.start.toJSON(),
+        when_max: this.pickupDateTime.end.toJSON(),
+        where: this.pickupLocation
       }
       try {
-        await this.$axios.post('/deliveries/', payload)
+        await this.$axios.post(`/deliveries/${this.deliveryId}/recipient_preference/`, payload)
         this.$q.loading.hide()
         this.$router.push('/deliveries/')
       } catch (error) {

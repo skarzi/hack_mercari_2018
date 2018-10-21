@@ -7,12 +7,12 @@
       class="list--self"
     >
       <q-list-header>
-        Your Deliveries
+        Possible deliveries
       </q-list-header>
       <q-item
-        v-for="delivery in deliveries"
+        v-for="delivery in assignments"
         :key="delivery.id"
-        :to="`/deliveries/${delivery.id}/` + ((delivery.recipient === userData.username && !delivery.recipient_preference) ? 'recipient-preference/' : 'status/')"
+        :to="`/courier-delivery/${delivery.id}`"
       >
         <q-item-main>
           <q-item-tile label>
@@ -37,14 +37,43 @@
         </q-item-main>
       </q-item>
     </q-list>
-    <q-btn
-      round
-      class="FAB fixed"
-      size="lg"
-      color="warning"
-      icon="add"
-      to="/new-delivery"
-    />
+    <q-list
+      highlight
+      multiline
+      no-border
+      class="list--self"
+    >
+      <q-list-header>
+        Accepted Deliveries
+      </q-list-header>
+      <q-item
+        v-for="delivery in deliveries"
+        :key="delivery.id"
+        :to="`/courier-delivery/${delivery.id}/`"
+      >
+        <q-item-main>
+          <q-item-tile label>
+            <p class="courier--name q-mb-xs">
+              Delivery <b>#{{ delivery.id }}</b>
+            </p>
+          </q-item-tile>
+          <q-item-tile
+            class="delivery--description"
+            v-if="delivery.description"
+            sublabel
+          >
+            {{ delivery.description }}
+          </q-item-tile>
+          <q-item-separator/>
+          <q-item-tile class="date__details" sublabel>
+            <strong>Status:</strong>
+            <span class="arrival-time">
+              {{ statusToMessageMapping[delivery.status] }}
+            </span>
+          </q-item-tile>
+        </q-item-main>
+      </q-item>
+    </q-list>
   </q-page>
 </template>
 
@@ -55,10 +84,11 @@ const conditionsNamespace = createNamespacedHelpers('conditions')
 const usersNamespace = createNamespacedHelpers('users')
 
 export default {
-  name: 'Deliveries',
+  name: 'CourierDeliveries',
   data () {
     return {
       deliveries: [],
+      assignments: [],
       statusToMessageMapping: {
         waiting_for_preference: 'Waiting for recipient preference',
         assigning: 'Assigning to courier',
@@ -74,7 +104,17 @@ export default {
   },
   methods: {
     ...conditionsNamespace.mapActions(['setToolbarVisibility']),
-    async getOrdersFromAPI () {
+    async getAssignmentsFromAPI () {
+      let path = '/assignments/'
+      if (this.isAuthenticated) {
+        this.$q.loading.show({
+        })
+        let response = await this.$axios.get(path)
+        this.assignments = response.data.reverse()
+        this.$q.loading.hide()
+      }
+    },
+    async getDeliveriesFromAPI () {
       let path = '/deliveries/'
       if (this.isAuthenticated) {
         this.$q.loading.show({
@@ -84,10 +124,17 @@ export default {
         this.$q.loading.hide()
       }
     }
+    // acceptDelivery (id) {
+    //   this.$swal({
+    //     title: 'Do you want to accept'
+    //   })
+    // }
+
   },
   mounted () {
     this.setToolbarVisibility(true)
-    this.getOrdersFromAPI()
+    this.getAssignmentsFromAPI()
+    this.getDeliveriesFromAPI()
   }
 }
 </script>

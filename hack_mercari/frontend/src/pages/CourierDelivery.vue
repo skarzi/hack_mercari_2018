@@ -1,35 +1,30 @@
 <template>
-  <q-page
-    padding
-    class="flex items-center justify-center"
-  >
-    <div class="page--container">
+  <q-page padding>
+    <div class="page--container" v-if="deliveryData">
       <div class="page--wrapper row">
         <div class="page--title col-xs-12 q-headline">
-          Details
+          Delivery #{{ deliveryData.id }}
         </div>
-        <div class="page--status col-xs-12">
-          <div class="info--label q-title">
-            <q-icon
-              name="fa fa-box-open"
-              color="warning"
-            />
-            Status
-          </div>
-          <div class="info--text q-subheading">
-            {{ deliveryStatus }}
-          </div>
-        </div>
+        <hr class="q-hr">
         <div class="page--address col-xs-12">
           <div class="info--label q-title">
+            Pickup
+          </div>
+          <div class="info--text q-subheading">
             <q-icon
               name="place"
               color="primary"
             />
-            Sender address
+            {{ deliveryData.sender_preference.where.address }}
           </div>
           <div class="info--text q-subheading">
-            {{ deliveryData.sender_preference.where.address }}
+            <q-icon
+              name="alarm"
+              color="primary"
+            />
+            {{ deliveryData.sender_preference.when_min.substring(0, 10) }}:
+            since {{ deliveryData.sender_preference.when_min.substring(11, 16) }}
+            until {{ deliveryData.sender_preference.when_max.substring(11, 16) }}
           </div>
         </div>
         <div
@@ -37,7 +32,7 @@
           v-if="deliveryData.recipient_preference"
         >
           <div class="info--label q-title">
-            Recipient address
+            Delivery
           </div>
           <div class="info--text q-subheading">
             <q-icon
@@ -46,8 +41,17 @@
             />
             {{ deliveryData.recipient_preference.where.address }}
           </div>
+          <div class="info--text q-subheading">
+            <q-icon
+              name="alarm"
+              color="negative"
+            />
+            {{ deliveryData.recipient_preference.when_min.substring(0, 10) }}:
+            since {{ deliveryData.recipient_preference.when_min.substring(11, 16) }}
+            until {{ deliveryData.recipient_preference.when_max.substring(11, 16) }}
+          </div>
         </div>
-        <div class="page--map-contaner col-xs-12">
+        <div class="page--map-contaner col-xs-12 q-mt-md">
           <gmap-map
             id="map"
             :center="mapData.center"
@@ -67,31 +71,38 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="offset-xs-1 col-xs-10">
+        <q-btn
+          v-if="deliveryData.status === 'assigning'"
+          label="Accept"
+          class="full-width"
+          @click="acceptDelivery(deliveryData.id)"
+          color="primary"
+        />
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex'
-import { isSuccessfull } from '../utils.js'
+import {createNamespacedHelpers} from 'vuex'
+import {isSuccessfull} from '../utils.js'
 
 const conditionsNamespace = createNamespacedHelpers('conditions')
-// const usersNamespace = createNamespacedHelpers('users')
+const usersNamespace = createNamespacedHelpers('users')
 
 export default {
-  name: 'DeliveryStatus',
+  name: 'ConfirmDelivery',
   data () {
     return {
-      deliveryData: {},
-      statusToMessageMapping: {
-        waiting_for_preference: 'Waiting for recipient preference',
-        assigning: 'Assigning to courier',
-        waiting_for_courier: 'Waiting for courier to pick up',
-        in_transit: `Package is on it's way!`,
-        delivered: 'Package delivered.'
-      }
+      deliveryData: null
     }
   },
   computed: {
+    ...usersNamespace.mapState([
+      'userData'
+    ]),
     mapData () {
       console.error(require('assets/recipient_icon.png'))
       let data = {
@@ -101,7 +112,7 @@ export default {
         },
         markers: [
           {
-            position: this.deliveryData.sender_preference.where.position,
+            position: this.deliveryData.recipient_preference.where.position,
             icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
           }
         ]
@@ -114,16 +125,18 @@ export default {
       }
       console.log(data)
       return data
-    },
-    deliveryStatus () {
-      return this.statusToMessageMapping[this.deliveryData.status]
     }
   },
   methods: {
-    ...conditionsNamespace.mapActions(['setToolbarVisibility']),
+    ...conditionsNamespace.mapActions([
+      'setToolbarVisibility'
+    ]),
     async getDeliveryByID (id) {
       this.$q.loading.show()
-      let response = await this.$axios.get(`/deliveries/${id}/`)
+      let response = await this.$axios.get(`/assignments/${id}/`)
+      if (!isSuccessfull(response)) {
+        response = await this.$axios.get(`/deliveries/${id}/`)
+      }
       if (isSuccessfull(response)) {
         this.deliveryData = response.data
         this.deliveryData.sender_preference.where = JSON.parse(
@@ -134,40 +147,55 @@ export default {
             this.deliveryData.recipient_preference.where
           )
         }
-        console.log(this.deliveryData)
       }
       this.$q.loading.hide()
+    },
+    acceptDelivery (id) {
+      this.$swal({
+        title: 'Please confirm',
+        text: 'Do you want to accept this delivery?',
+        showCancelButton: true
+      }).then((result) => {
+        if (result.value) {
+          this.$axios.post(`/assignments/${id}/accept/`)
+            .then(() => {
+              this.$router.push('/courier-deliveries/')
+            })
+        }
+      })
     }
   },
-  mounted () {
+  created () {
     this.setToolbarVisibility(true)
+    if (!this.userData.is_courier) {
+      this.$router.push('/')
+    }
     this.deliveryData = this.getDeliveryByID(this.$route.params.id)
   }
 }
 </script>
 
 <style scoped lang="stylus">
-@import '~variables'
+  @import '~variables'
 
-.page--container
-  padding 15px
+  .page--container
+    padding 15px
 
-.page--wrapper
-  padding 10px
-  background-color white
+  .page--wrapper
+    padding 10px
+    background-color white
 
-.page--title
-  margin-top 10px
+  .page--title
+    margin-top 10px
 
-.info--label
-  margin-top 15px
+  .info--label
+    margin-top 15px
 
-.info--text
-  margin 5px 15px
-  color $faded
+  .info--text
+    color $faded
 
-#map
-  padding-top 30px
-  width 100%
-  height 420px
+  #map
+    padding-top 30px
+    width 100%
+    height 420px
 </style>
