@@ -90,7 +90,7 @@
         />
         <q-btn
           v-if="deliveryData.status === 'in_transit'"
-          label="Pick up"
+          label="Deliver"
           class="full-width"
           @click="deliverDelivery(deliveryData.id)"
           color="primary"
@@ -134,7 +134,7 @@ export default {
         },
         markers: [
           {
-            position: this.deliveryData.recipient_preference.where.position,
+            position: this.deliveryData.sender_preference.where.position,
             icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
           }
         ]
