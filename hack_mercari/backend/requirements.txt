@@ -1,0 +1,5 @@
+celery
+django
+djangorestframework
+django_cors_headers
+pusher
