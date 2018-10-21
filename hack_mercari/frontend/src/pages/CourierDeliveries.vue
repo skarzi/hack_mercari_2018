@@ -131,10 +131,22 @@ export default {
     // }
 
   },
-  mounted () {
+  created () {
     this.setToolbarVisibility(true)
     this.getAssignmentsFromAPI()
     this.getDeliveriesFromAPI()
+    // pusher
+    const channel = this.$pusher.channel(this.userData.username)
+    channel.bind('delivery-updated', () => {
+      // refresh deliveries
+      this.getAssignmentsFromAPI()
+      this.getDeliveriesFromAPI()
+    })
+    channel.bind('new-assignment', () => {
+      // refresh deliveries
+      this.getAssignmentsFromAPI()
+      this.getDeliveriesFromAPI()
+    })
   }
 }
 </script>

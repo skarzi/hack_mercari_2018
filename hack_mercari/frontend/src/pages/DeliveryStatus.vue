@@ -3,33 +3,32 @@
     padding
     class="flex items-center justify-center"
   >
-    <div class="page--container">
+    <div class="page--container" v-if="deliveryData">
       <div class="page--wrapper row">
         <div class="page--title col-xs-12 q-headline">
-          Details
+          Delivery #{{ deliveryData.id }} <br>
+          <small class="text-light">{{ statusToMessageMapping[deliveryData.status] }}</small>
         </div>
-        <div class="page--status col-xs-12">
-          <div class="info--label q-title">
-            <q-icon
-              name="fa fa-box-open"
-              color="warning"
-            />
-            Status
-          </div>
-          <div class="info--text q-subheading">
-            {{ deliveryStatus }}
-          </div>
-        </div>
+        <hr class="q-hr">
         <div class="page--address col-xs-12">
           <div class="info--label q-title">
+            Pickup
+          </div>
+          <div class="info--text q-subheading">
             <q-icon
               name="place"
               color="primary"
             />
-            Sender address
+            {{ deliveryData.sender_preference.where.address }}
           </div>
           <div class="info--text q-subheading">
-            {{ deliveryData.sender_preference.where.address }}
+            <q-icon
+              name="alarm"
+              color="primary"
+            />
+            {{ deliveryData.sender_preference.when_min.substring(0, 10) }}
+            since {{ deliveryData.sender_preference.when_min.substring(11, 16) }}
+            until {{ deliveryData.sender_preference.when_max.substring(11, 16) }}
           </div>
         </div>
         <div
@@ -37,7 +36,7 @@
           v-if="deliveryData.recipient_preference"
         >
           <div class="info--label q-title">
-            Recipient address
+            Delivery
           </div>
           <div class="info--text q-subheading">
             <q-icon
@@ -46,8 +45,17 @@
             />
             {{ deliveryData.recipient_preference.where.address }}
           </div>
+          <div class="info--text q-subheading">
+            <q-icon
+              name="alarm"
+              color="negative"
+            />
+            {{ deliveryData.recipient_preference.when_min.substring(0, 10) }}
+            since {{ deliveryData.recipient_preference.when_min.substring(11, 16) }}
+            until {{ deliveryData.recipient_preference.when_max.substring(11, 16) }}
+          </div>
         </div>
-        <div class="page--map-contaner col-xs-12">
+        <div class="page--map-contaner col-xs-12 q-mt-md">
           <gmap-map
             id="map"
             :center="mapData.center"
@@ -75,13 +83,13 @@ import { createNamespacedHelpers } from 'vuex'
 import { isSuccessfull } from '../utils.js'
 
 const conditionsNamespace = createNamespacedHelpers('conditions')
-// const usersNamespace = createNamespacedHelpers('users')
+const usersNamespace = createNamespacedHelpers('users')
 
 export default {
   name: 'DeliveryStatus',
   data () {
     return {
-      deliveryData: {},
+      deliveryData: null,
       statusToMessageMapping: {
         waiting_for_preference: 'Waiting for recipient preference',
         assigning: 'Assigning to courier',
@@ -92,6 +100,7 @@ export default {
     }
   },
   computed: {
+    ...usersNamespace.mapState(['userData']),
     mapData () {
       console.error(require('assets/recipient_icon.png'))
       let data = {
@@ -139,9 +148,14 @@ export default {
       this.$q.loading.hide()
     }
   },
-  mounted () {
+  created () {
     this.setToolbarVisibility(true)
     this.deliveryData = this.getDeliveryByID(this.$route.params.id)
+    // pusher
+    const channel = this.$pusher.channel(this.userData.username)
+    channel.bind('delivery-updated', () => {
+      this.deliveryData = this.getDeliveryByID(this.$route.params.id)
+    })
   }
 }
 </script>
@@ -163,7 +177,6 @@ export default {
   margin-top 15px
 
 .info--text
-  margin 5px 15px
   color $faded
 
 #map

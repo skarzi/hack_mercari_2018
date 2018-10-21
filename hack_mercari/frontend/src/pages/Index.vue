@@ -100,17 +100,12 @@ export default {
       if (!this.userData) {
         return
       }
-      channel.bind('deliver-updated', (data) => {
-        // refresh deliveries
-        this.$router.go()
-      })
       channel.bind('pass-to-courier', (data) => {
         console.log(`passed to courier delivery #${data.delivery}`)
         this.notifyUser({
-          title: 'Your delivery have been picked up by courier!',
-          text: '',
-          confirmText: 'Accept',
-          cancelText: 'Cancel'
+          title: 'Confirm pick up',
+          confirmText: 'Confirm',
+          cancelText: 'Dismiss'
         }).then((result) => {
           if (result.value) {
             this.$axios.post(
@@ -122,9 +117,8 @@ export default {
       channel.bind('receive', (data) => {
         console.log(`receive to courier delivery #${data.delivery}`)
         this.notifyUser({
-          title: 'Someone want to deliver you something!',
-          text: '',
-          confirmText: 'Cool',
+          title: 'Confirm delivery',
+          confirmText: 'Confirm',
           cancelText: 'Dismiss'
         }).then((result) => {
           if (result.value) {
@@ -134,11 +128,6 @@ export default {
           }
         })
       })
-      if (this.userData.is_courier) {
-        channel.bind('new-assignment', (data) => {
-          this.$router.go('/deliveries')
-        })
-      }
     },
     notifyUser (data) {
       return this.$swal({

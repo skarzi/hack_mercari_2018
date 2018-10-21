@@ -3,7 +3,8 @@
     <div class="page--container" v-if="deliveryData">
       <div class="page--wrapper row">
         <div class="page--title col-xs-12 q-headline">
-          Delivery #{{ deliveryData.id }}
+          Delivery #{{ deliveryData.id }} <br>
+          <small class="text-light">{{ statusToMessageMapping[deliveryData.status] }}</small>
         </div>
         <hr class="q-hr">
         <div class="page--address col-xs-12">
@@ -22,7 +23,7 @@
               name="alarm"
               color="primary"
             />
-            {{ deliveryData.sender_preference.when_min.substring(0, 10) }}:
+            {{ deliveryData.sender_preference.when_min.substring(0, 10) }}
             since {{ deliveryData.sender_preference.when_min.substring(11, 16) }}
             until {{ deliveryData.sender_preference.when_max.substring(11, 16) }}
           </div>
@@ -46,7 +47,7 @@
               name="alarm"
               color="negative"
             />
-            {{ deliveryData.recipient_preference.when_min.substring(0, 10) }}:
+            {{ deliveryData.recipient_preference.when_min.substring(0, 10) }}
             since {{ deliveryData.recipient_preference.when_min.substring(11, 16) }}
             until {{ deliveryData.recipient_preference.when_max.substring(11, 16) }}
           </div>
@@ -80,6 +81,20 @@
           @click="acceptDelivery(deliveryData.id)"
           color="primary"
         />
+        <q-btn
+          v-if="deliveryData.status === 'waiting_for_courier'"
+          label="Pick up"
+          class="full-width"
+          @click="pickupDelivery(deliveryData.id)"
+          color="primary"
+        />
+        <q-btn
+          v-if="deliveryData.status === 'in_transit'"
+          label="Pick up"
+          class="full-width"
+          @click="deliverDelivery(deliveryData.id)"
+          color="primary"
+        />
       </div>
     </div>
   </q-page>
@@ -96,7 +111,14 @@ export default {
   name: 'ConfirmDelivery',
   data () {
     return {
-      deliveryData: null
+      deliveryData: null,
+      statusToMessageMapping: {
+        waiting_for_preference: 'Waiting for recipient preference',
+        assigning: 'Assigning to courier',
+        waiting_for_courier: 'Waiting for courier to pick up',
+        in_transit: `Package is on it's way!`,
+        delivered: 'Package delivered.'
+      }
     }
   },
   computed: {
@@ -163,6 +185,22 @@ export default {
             })
         }
       })
+    },
+    pickupDelivery (id) {
+      this.$axios.post(`/deliveries/${id}/request_pass_to_courier/`)
+        .then(() => {
+          this.$swal({
+            text: 'Request to sender has been made.'
+          })
+        })
+    },
+    deliverDelivery (id) {
+      this.$axios.post(`/deliveries/${id}/request_receive/`)
+        .then(() => {
+          this.$swal({
+            text: 'Request to recipient has been made.'
+          })
+        })
     }
   },
   created () {
@@ -171,6 +209,12 @@ export default {
       this.$router.push('/')
     }
     this.deliveryData = this.getDeliveryByID(this.$route.params.id)
+    // pusher
+    const channel = this.$pusher.channel(this.userData.username)
+    channel.bind('delivery-updated', () => {
+      // refresh deliveries
+      this.deliveryData = this.getDeliveryByID(this.$route.params.id)
+    })
   }
 }
 </script>

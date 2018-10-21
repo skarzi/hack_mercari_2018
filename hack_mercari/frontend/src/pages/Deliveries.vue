@@ -85,9 +85,15 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.setToolbarVisibility(true)
     this.getOrdersFromAPI()
+    // pusher
+    const channel = this.$pusher.channel(this.userData.username)
+    channel.bind('delivery-updated', () => {
+      // refresh deliveries
+      this.getOrdersFromAPI()
+    })
   }
 }
 </script>
